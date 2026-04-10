@@ -1,0 +1,23 @@
+name: 'life_insurance_bel'
+version: '1.0.0'
+config-version: 2
+
+profile: 'life_insurance_bel'
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+
+models:
+  life_insurance_bel:
+    staging:
+      +schema: stg
+    intermediate:
+      +schema: int
+    mart:
+      +schema: mart
+    validation:
+      +schema: val
