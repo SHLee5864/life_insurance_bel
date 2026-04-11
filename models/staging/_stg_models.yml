@@ -1,0 +1,64 @@
+version: 2
+models:
+  - name: stg_policy_cohort_input
+    description: "Standardized model point portfolio with derived attained_age and remaining_term_years."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['cohort_id', 'sex']
+    columns:
+      - name: cohort_id
+        tests: [not_null]
+      - name: sex
+        tests: [not_null]
+
+  - name: stg_mortality_assumption
+    description: "Base version mortality rates by age and sex."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['age', 'sex']
+    columns:
+      - name: age
+        tests: [not_null]
+      - name: sex
+        tests: [not_null]
+
+  - name: stg_lapse_assumption
+    description: "Base version duration-based lapse rates."
+    columns:
+      - name: duration_year
+        tests: [not_null, unique]
+
+  - name: stg_discount_curve
+    description: "Base version risk-free discount curve."
+    columns:
+      - name: tenor_month
+        tests: [not_null, unique]
+
+  - name: stg_expense_assumption
+    description: "Base version expense assumptions."
+    columns:
+      - name: expense_type
+        tests: [not_null]
+
+  - name: stg_premium_input
+    description: "Locked-in gross premiums by cohort and sex."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['cohort_id', 'sex']
+    columns:
+      - name: cohort_id
+        tests: [not_null]
+      - name: sex
+        tests: [not_null]
+
+  - name: stg_stress_scenario_definition
+    description: "Parameterized stress scenario definitions with coalesced multipliers."
+    columns:
+      - name: scenario_id
+        tests: [not_null, unique]
+
+  - name: stg_assumption_version
+    description: "Assumption version governance metadata."

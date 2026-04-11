@@ -1,0 +1,13 @@
+version: 2
+sources:
+  - name: life_insurance_raw
+    schema: life_insurance_raw
+    tables:
+      - name: policy_cohort_input
+      - name: premium_input
+      - name: mortality_assumption
+      - name: lapse_assumption
+      - name: discount_curve
+      - name: expense_assumption
+      - name: stress_scenario_definition
+      - name: assumption_version
