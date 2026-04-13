@@ -1,0 +1,176 @@
+version: 2
+
+models:
+  - name: int_projection_frame
+    description: "Projection time axis for all cohort × scenario combinations. Generates monthly projection periods from 1 to remaining_months."
+    columns:
+      - name: cohort_id
+        tests:
+          - not_null
+      - name: scenario_id
+        tests:
+          - not_null
+      - name: projection_month
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+
+  - name: int_projection_mortality_rates
+    description: "Monthly mortality rates per cohort × scenario × projection_month. Annual rates converted to monthly and stress multiplier applied."
+    columns:
+      - name: base_qx_annual
+        tests:
+          - not_null
+      - name: base_qx_monthly
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+      - name: scenario_qx_monthly
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+
+  - name: int_projection_lapse_rates
+    description: "Monthly lapse rates per cohort × scenario × projection_month. Duration-based annual rates converted to monthly and stress multiplier applied."
+    columns:
+      - name: base_lapse_annual
+        tests:
+          - not_null
+      - name: scenario_lapse_monthly
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+
+  - name: int_inforce_rollforward
+    description: "Monthly in-force roll-forward applying mortality then lapse decrements. Core actuarial state engine."
+    columns:
+      - name: inforce_open
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: inforce_close
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: expected_deaths
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: expected_lapses
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: post_death_inforce
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0              
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+
+  - name: int_cashflow_lines
+    description: "Premium, death benefit, and expense cashflows with timing flags. Three rows per cohort × scenario × projection_month."
+    columns:
+      - name: cashflow_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['premium', 'death_benefit', 'expense']
+      - name: cashflow_timing
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['month_start', 'month_end']
+      - name: cashflow_amount
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+              - cashflow_type
+
+  - name: int_cashflows_discounted
+    description: "Cashflows with discount factors applied. Timing-conditional discounting: month_start uses DF(t-1), month_end uses DF(t)."
+    columns:
+      - name: discount_factor
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: discounted_cashflow
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+              - projection_month
+              - cashflow_type
+
+  - name: int_bel_components
+    description: "BEL calculation per cohort × sex × scenario. BEL = benefit_pv + expense_pv + premium_pv (premium_pv is negative)."
+    columns:
+      - name: bel_amount
+        tests:
+          - not_null
+      - name: policy_count
+        tests:
+          - not_null
+      - name: bel_per_policy
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id

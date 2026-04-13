@@ -1,0 +1,114 @@
+version: 2
+
+models:
+  - name: val_projection_continuity
+    description: "Validates projection skeleton integrity: month sequence starts at 1, is continuous, and ends at remaining_months."
+    columns:
+      - name: projection_ok
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_inforce_reconciliation
+    description: "Validates actuarial identity: inforce_open - deaths - lapses = inforce_close. Most critical validation table."
+    columns:
+      - name: inforce_ok
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_cashflow_sign_and_timing
+    description: "Validates cashflow sign convention (premium negative, benefit/expense positive) and timing (premium month_start, others month_end)."
+    columns:
+      - name: cashflow_ok
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_discounting_sanity
+    description: "Validates discount factors are positive and non-null."
+    columns:
+      - name: discount_ok
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_bel_reconciliation
+    description: "Validates BEL identity: benefit_pv + expense_pv + premium_pv = bel_amount."
+    columns:
+      - name: bel_reconciled
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_sensitivity_direction
+    description: "Validates stress results follow expected actuarial directions. Lapse direction excluded as it varies by cohort."
+    columns:
+      - name: sensitivity_ok
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: val_validation_summary
+    description: "Aggregated validation gate. Single PASS/FAIL per cohort × sex × scenario combining all validation checks."
+    columns:
+      - name: overall_validation_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id

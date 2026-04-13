@@ -21,3 +21,6 @@ models:
       +schema: mart
     validation:
       +schema: val
+
+vars:
+  valuation_date: '2026-01-01'

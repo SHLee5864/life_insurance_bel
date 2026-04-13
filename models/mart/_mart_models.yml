@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: mart_bel_components_core
+    description: "BEL components per cohort × sex × scenario. Base and stressed views unified. Core analytical output."
+    columns:
+      - name: bel_amount
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: mart_bel_sensitivity
+    description: "BEL delta per cohort × sex × stressed scenario vs base. Shows direction and magnitude of stress impact."
+    columns:
+      - name: delta_bel
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: mart_validation_summary
+    description: "Trust gate. PASS/FAIL per cohort × sex × scenario from validation layer."
+    columns:
+      - name: overall_validation_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PASS', 'FAIL']
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cohort_id
+              - sex
+              - scenario_id
+
+  - name: mart_portfolio_overview
+    description: "Portfolio-level BEL and sensitivity summary per scenario. Management view."
+    columns:
+      - name: scenario_id
+        tests:
+          - not_null
+          - unique
+      - name: total_bel
+        tests:
+          - not_null
