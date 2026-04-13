@@ -1,0 +1,10 @@
+scenario_id,scenario_group,total_bel_M,delta_bel_M,delta_pct
+COMBINED_ADVERSE,Advanced,32.83,14.69,81.0
+MORT_UP,Core,30.57,12.43,68.5
+PERSIST_IMPROVE,Advanced,22.01,3.86,21.3
+RATE_DOWN,Core,19.91,1.77,9.7
+LAPSE_DOWN,Core,19.36,1.22,6.7
+BASE,Base,18.14,0.0,0.0
+LAPSE_UP,Core,16.99,-1.15,-6.3
+RATE_UP,Core,16.51,-1.63,-9.0
+MORT_DOWN,Core,5.5,-12.64,-69.7
