@@ -9,13 +9,14 @@ aggregated as (
         cohort_id,
         sex,
         scenario_id,
+        version_id,
 
         sum(case when cashflow_type = 'premium' then discounted_cashflow else 0 end) as premium_pv,
         sum(case when cashflow_type = 'death_benefit' then discounted_cashflow else 0 end) as benefit_pv,
         sum(case when cashflow_type = 'expense' then discounted_cashflow else 0 end) as expense_pv
 
     from discounted
-    group by cohort_id, sex, scenario_id
+    group by cohort_id, sex, scenario_id, version_id
 ),
 
 final as (
@@ -23,6 +24,7 @@ final as (
         a.cohort_id,
         a.sex,
         a.scenario_id,
+        a.version_id,
         a.premium_pv,
         a.benefit_pv,
         a.expense_pv,

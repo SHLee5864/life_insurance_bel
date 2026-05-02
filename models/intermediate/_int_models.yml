@@ -154,6 +154,7 @@ models:
               - scenario_id
               - projection_month
               - cashflow_type
+              - version_id
 
   - name: int_bel_components
     description: "BEL calculation per cohort × sex × scenario. BEL = benefit_pv + expense_pv + premium_pv (premium_pv is negative)."
@@ -174,3 +175,4 @@ models:
               - cohort_id
               - sex
               - scenario_id
+              - version_id

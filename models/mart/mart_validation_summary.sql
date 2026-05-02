@@ -5,6 +5,7 @@ select
     sex,
     scenario_id,
     projection_ok,
+    version_id,
     inforce_ok,
     cashflow_ok,
     discount_ok,

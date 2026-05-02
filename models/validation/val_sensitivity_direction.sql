@@ -1,13 +1,13 @@
 {{ config(materialized='view') }}
 
 with base as (
-    select cohort_id, sex, bel_amount as bel_base
+    select cohort_id, sex, version_id, bel_amount as bel_base
     from {{ ref('int_bel_components') }}
     where scenario_id = 'BASE'
 ),
 
 stressed as (
-    select cohort_id, sex, scenario_id, bel_amount as bel_stressed
+    select cohort_id, sex, version_id, scenario_id, bel_amount as bel_stressed
     from {{ ref('int_bel_components') }}
     where scenario_id != 'BASE'
 ),
@@ -16,6 +16,7 @@ joined as (
     select
         s.cohort_id,
         s.sex,
+        s.version_id,
         s.scenario_id,
         b.bel_base,
         s.bel_stressed,
@@ -24,6 +25,7 @@ joined as (
     inner join base b
         on s.cohort_id = b.cohort_id
         and s.sex = b.sex
+        and s.version_id = b.version_id
 )
 
 select

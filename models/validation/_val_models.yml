@@ -64,6 +64,7 @@ models:
               - cohort_id
               - sex
               - scenario_id
+              - version_id
 
   - name: val_bel_reconciliation
     description: "Validates BEL identity: benefit_pv + expense_pv + premium_pv = bel_amount."
@@ -80,6 +81,7 @@ models:
               - cohort_id
               - sex
               - scenario_id
+              - version_id
 
   - name: val_sensitivity_direction
     description: "Validates stress results follow expected actuarial directions. Lapse direction excluded as it varies by cohort."
@@ -96,6 +98,7 @@ models:
               - cohort_id
               - sex
               - scenario_id
+              - version_id
 
   - name: val_validation_summary
     description: "Aggregated validation gate. Single PASS/FAIL per cohort × sex × scenario combining all validation checks."
@@ -112,3 +115,4 @@ models:
               - cohort_id
               - sex
               - scenario_id
+              - version_id

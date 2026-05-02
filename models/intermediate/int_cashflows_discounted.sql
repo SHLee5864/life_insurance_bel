@@ -10,7 +10,7 @@ frame as (
 ),
 
 curve as (
-    select tenor_month, zero_rate_annual
+    select tenor_month, zero_rate_annual, version_id
     from {{ ref('stg_discount_curve') }}
 ),
 
@@ -55,16 +55,28 @@ interpolated as (
 
     from discount_months dm
 ),
+-- curve versions cross join
+with_curve_version as (
+    select
+        i.*,
+        cv.version_id
+    from interpolated i
+    cross join (select distinct version_id from curve) cv
+),
 
 -- lower/upper rate JOIN
 with_rates as (
     select
-        i.*,
+        wcv.*,
         coalesce(cl.zero_rate_annual, 0.0) as lower_rate,
         cu.zero_rate_annual as upper_rate
-    from interpolated i
-    left join curve cl on i.lower_tenor = cl.tenor_month
-    left join curve cu on i.upper_tenor = cu.tenor_month
+    from with_curve_version wcv
+    left join curve cl 
+        on wcv.lower_tenor = cl.tenor_month 
+        and wcv.version_id = cl.version_id
+    left join curve cu 
+        on wcv.upper_tenor = cu.tenor_month 
+        and wcv.version_id = cu.version_id
 ),
 
 -- 선형 보간 + stress shift + DF 계산
@@ -78,6 +90,7 @@ final as (
         cashflow_amount,
         cashflow_timing,
         discount_month,
+        version_id,
 
         -- 보간된 zero rate
         case
@@ -115,6 +128,7 @@ select
     cashflow_type,
     cashflow_amount,
     cashflow_timing,
+    version_id,
     discount_factor,
     cashflow_amount * discount_factor as discounted_cashflow
 from final

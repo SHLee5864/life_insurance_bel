@@ -34,7 +34,9 @@ models:
     description: "Base version risk-free discount curve."
     columns:
       - name: tenor_month
-        tests: [not_null, unique]
+        tests: [not_null]
+      - name: version_id
+        tests: [not_null]
 
   - name: stg_expense_assumption
     description: "Base version expense assumptions."

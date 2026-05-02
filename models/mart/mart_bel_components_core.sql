@@ -23,6 +23,7 @@ select
     f.remaining_term_years,
     b.scenario_id,
     s.scenario_group,
+    b.version_id,
     b.premium_pv,
     b.benefit_pv,
     b.expense_pv,

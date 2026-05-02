@@ -5,13 +5,13 @@ with core as (
 ),
 
 base as (
-    select cohort_id, sex, bel_amount as bel_base
+    select cohort_id, sex, version_id, bel_amount as bel_base
     from core
     where scenario_id = 'BASE'
 ),
 
 stressed as (
-    select cohort_id, sex, scenario_id, scenario_group, bel_amount as bel_stressed
+    select cohort_id, sex, scenario_id, version_id, scenario_group, bel_amount as bel_stressed
     from core
     where scenario_id != 'BASE'
 )
@@ -21,6 +21,7 @@ select
     s.sex,
     s.scenario_id,
     s.scenario_group,
+    s.version_id,
     b.bel_base,
     s.bel_stressed,
     s.bel_stressed - b.bel_base as delta_bel,
@@ -32,3 +33,4 @@ from stressed s
 inner join base b
     on s.cohort_id = b.cohort_id
     and s.sex = b.sex
+    and s.version_id = b.version_id
