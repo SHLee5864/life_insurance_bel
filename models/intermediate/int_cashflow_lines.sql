@@ -19,6 +19,7 @@ monthly_premium as (
         i.cohort_id,
         i.sex,
         i.scenario_id,
+        i.mort_version_id,
         i.projection_month,
         i.inforce_open,
         i.expected_deaths,
@@ -33,7 +34,7 @@ monthly_premium as (
 cashflows as (
     -- Premium: negative (insurer inflow), month_start
     select
-        cohort_id, sex, scenario_id, projection_month,
+        cohort_id, sex, scenario_id, mort_version_id, projection_month,
         'premium' as cashflow_type,
         -(inforce_open * monthly_premium) as cashflow_amount,
         'month_start' as cashflow_timing
@@ -43,7 +44,7 @@ cashflows as (
 
     -- Death Benefit: positive (insurer outflow), month_end
     select
-        mp.cohort_id, mp.sex, mp.scenario_id, mp.projection_month,
+        mp.cohort_id, mp.sex, mp.scenario_id, mp.mort_version_id, mp.projection_month,
         'death_benefit' as cashflow_type,
         mp.expected_deaths * i.sum_assured as cashflow_amount,
         'month_end' as cashflow_timing
@@ -58,7 +59,7 @@ cashflows as (
 
     -- Expense: positive (insurer outflow), month_end
     select
-        cohort_id, sex, scenario_id, projection_month,
+        cohort_id, sex, scenario_id, mort_version_id, projection_month,
         'expense' as cashflow_type,
         inforce_open * monthly_premium * e.expense_rate as cashflow_amount,
         'month_end' as cashflow_timing

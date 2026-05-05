@@ -6,10 +6,11 @@ with checks as (
         sex,
         scenario_id,
         version_id,
+        mort_version_id,
         sum(case when discount_factor <= 0 then 1 else 0 end) as df_non_positive,
         sum(case when discount_factor is null then 1 else 0 end) as df_null
     from {{ ref('int_cashflows_discounted') }}
-    group by cohort_id, sex, scenario_id, version_id
+    group by cohort_id, sex, scenario_id, version_id, mort_version_id
 )
 
 select

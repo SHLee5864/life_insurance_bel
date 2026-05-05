@@ -48,6 +48,7 @@ models:
               - sex
               - scenario_id
               - projection_month
+              - mort_version_id
 
   - name: int_projection_lapse_rates
     description: "Monthly lapse rates per cohort × scenario × projection_month. Duration-based annual rates converted to monthly and stress multiplier applied."
@@ -106,6 +107,7 @@ models:
               - sex
               - scenario_id
               - projection_month
+              - mort_version_id
 
   - name: int_cashflow_lines
     description: "Premium, death benefit, and expense cashflows with timing flags. Three rows per cohort × scenario × projection_month."
@@ -132,6 +134,7 @@ models:
               - scenario_id
               - projection_month
               - cashflow_type
+              - mort_version_id
 
   - name: int_cashflows_discounted
     description: "Cashflows with discount factors applied. Timing-conditional discounting: month_start uses DF(t-1), month_end uses DF(t)."
@@ -155,6 +158,7 @@ models:
               - projection_month
               - cashflow_type
               - version_id
+              - mort_version_id
 
   - name: int_bel_components
     description: "BEL calculation per cohort × sex × scenario. BEL = benefit_pv + expense_pv + premium_pv (premium_pv is negative)."
@@ -176,3 +180,4 @@ models:
               - sex
               - scenario_id
               - version_id
+              - mort_version_id

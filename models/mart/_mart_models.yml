@@ -15,6 +15,7 @@ models:
               - sex
               - scenario_id
               - version_id
+              - mort_version_id
 
   - name: mart_bel_sensitivity
     description: "BEL delta per cohort × sex × stressed scenario vs base. Shows direction and magnitude of stress impact."
@@ -30,6 +31,7 @@ models:
               - sex
               - scenario_id
               - version_id
+              - mort_version_id
 
   - name: mart_validation_summary
     description: "Trust gate. PASS/FAIL per cohort × sex × scenario from validation layer."
@@ -47,7 +49,7 @@ models:
               - sex
               - scenario_id
               - version_id
-
+              - mort_version_id
   - name: mart_portfolio_overview
     description: "Portfolio-level BEL and sensitivity summary per scenario. Management view."
     columns:
@@ -63,4 +65,5 @@ models:
             combination_of_columns:
               - scenario_id
               - version_id
+              - mort_version_id
           

@@ -6,6 +6,7 @@ select
     scenario_id,
     projection_ok,
     version_id,
+    mort_version_id,
     inforce_ok,
     cashflow_ok,
     discount_ok,

@@ -24,6 +24,7 @@ select
     b.scenario_id,
     s.scenario_group,
     b.version_id,
+    b.mort_version_id,
     b.premium_pv,
     b.benefit_pv,
     b.expense_pv,

@@ -20,6 +20,7 @@ combined as (
         f.projection_month,
         f.policy_count,
         m.scenario_qx_monthly as qx,
+        m.mort_version_id,
         l.scenario_lapse_monthly as lx,
 
         -- 월별 생존율 (사망도 해지도 안 한 비율)
@@ -43,6 +44,7 @@ rollforward as (
         cohort_id,
         sex,
         scenario_id,
+        mort_version_id,
         projection_month,
         policy_count,
         qx,
@@ -53,7 +55,7 @@ rollforward as (
             exp(
                 sum(ln(monthly_survival))
                 over (
-                    partition by cohort_id, sex, scenario_id
+                    partition by cohort_id, sex, scenario_id, mort_version_id
                     order by projection_month
                     rows between unbounded preceding and 1 preceding
                 )
@@ -68,6 +70,7 @@ select
     cohort_id,
     sex,
     scenario_id,
+    mort_version_id,
     projection_month,
     policy_count,
     inforce_open,

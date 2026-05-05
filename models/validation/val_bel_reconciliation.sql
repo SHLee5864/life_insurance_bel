@@ -5,6 +5,7 @@ select
     sex,
     scenario_id,
     version_id,
+    mort_version_id,
     premium_pv,
     benefit_pv,
     expense_pv,
