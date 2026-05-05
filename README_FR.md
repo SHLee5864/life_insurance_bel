@@ -143,6 +143,43 @@ Sous RATE_DOWN (-50bp), les taux de base à court terme proches de zéro peuvent
 
 ---
 
+## 📈 Analyse Multi-Courbes EIOPA RFR
+
+Le pipeline supporte simultanément plusieurs courbes d'actualisation EIOPA RFR, permettant la comparaison du BEL entre versions de courbes.
+
+### Courbes Chargées
+
+| Version ID | Date | VA | Source |
+|---|---|---|---|
+| RFR_20251231_noVA | 2025-12-31 | Non | EIOPA Monthly RFR |
+| RFR_20251231_withVA | 2025-12-31 | Oui | EIOPA Monthly RFR |
+| RFR_20260331_noVA | 2026-03-31 | Non | EIOPA Monthly RFR |
+| RFR_20260331_withVA | 2026-03-31 | Oui | EIOPA Monthly RFR |
+
+### Impact BEL (Scénario BASE)
+
+| Courbe | BEL Total | Δ vs 2025-Q4 noVA |
+|---|---|---|
+| 2025-Q4 sans VA | 18,14M€ | — |
+| 2025-Q4 avec VA | 17,67M€ | −2,6% |
+| 2026-Q1 sans VA | 18,04M€ | −0,6% |
+| 2026-Q1 avec VA | 17,44M€ | −3,9% |
+
+**Écart maximum : 0,70M€ (3,9%)** — entièrement dû au choix de la courbe d'actualisation.
+
+### Implémentation
+
+L'ajout de quatre courbes a nécessité la modification de 9 modèles dbt sans aucun changement de logique actuarielle :
+- `stg_discount_curve` — suppression du filtre mono-version, exposition de toutes les versions de courbes
+- `int_cashflows_discounted` — cross join avec les versions de courbes pour actualisation parallèle
+- Modèles en aval — propagation du `version_id` dans les GROUP BY et conditions de JOIN
+
+Cela a fonctionné car les courbes d'actualisation étaient modélisées comme des données (hypothèses versionnées), et non comme de la logique.
+
+Voir [Article Medium #10 : Discounting Is Not a Number](https://medium.com/@lsh5864) pour l'analyse complète.
+
+---
+
 ## Cadre de Validation
 
 Chaque calcul est validé contre les identités actuarielles :
@@ -206,8 +243,8 @@ Ce projet est la Partie 3 d'une série de 5 projets construisant une plateforme 
 1. **Small :** Insurance Policy Admin Mart — Structure de portefeuille & KPIs
 2. **Medium-1 :** Motor Insurance Claims Development & Loss Forecasting (P&C, rétrospectif)
 3. **Medium-2 :** Ce projet — Pipeline BEL Assurance Vie (Vie, prospectif)
-4. **Medium-3 :** Réassurance IFRS 17 — Lien Rétro & Recouvrement de Sinistres (planifié)
-5. **Large :** Plateforme Analytics IFRS 17 sur Azure — E2E avec CI/CD + Méthode de Mack (planifié)
+4. **Medium-3:** Reinsurance IFRS 17 — Retro Linkage & Loss Recovery
+5. **Large:** Insurance Fraud Detection Pipeline on Azure (planned)
 
 ---
 

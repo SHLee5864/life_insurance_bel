@@ -174,6 +174,43 @@ Under RATE_DOWN (-50bps), short-tenor base rates near zero can produce negative 
 
 ---
 
+## 📈 Multi-Curve EIOPA RFR Analysis
+
+The pipeline supports multiple EIOPA RFR discount curves simultaneously, enabling BEL comparison across curve versions.
+
+### Curves Loaded
+
+| Version ID | Date | VA | Source |
+|---|---|---|---|
+| RFR_20251231_noVA | 2025-12-31 | No | EIOPA Monthly RFR |
+| RFR_20251231_withVA | 2025-12-31 | Yes | EIOPA Monthly RFR |
+| RFR_20260331_noVA | 2026-03-31 | No | EIOPA Monthly RFR |
+| RFR_20260331_withVA | 2026-03-31 | Yes | EIOPA Monthly RFR |
+
+### BEL Impact (BASE Scenario)
+
+| Curve | Total BEL | Δ vs 2025-Q4 noVA |
+|---|---|---|
+| 2025-Q4 no VA | €18.14M | — |
+| 2025-Q4 with VA | €17.67M | −2.6% |
+| 2026-Q1 no VA | €18.04M | −0.6% |
+| 2026-Q1 with VA | €17.44M | −3.9% |
+
+**Maximum difference: €0.70M (3.9%)** — driven entirely by discount curve selection.
+
+### Implementation
+
+Adding four curves required modifying 9 dbt models with zero changes to actuarial logic:
+- `stg_discount_curve` — removed single-version filter, exposing all curve versions
+- `int_cashflows_discounted` — cross join with curve versions for parallel discounting
+- Downstream models — `version_id` propagation through GROUP BY and JOIN conditions
+
+This worked because discount curves were modeled as data (versioned assumptions), not as logic.
+
+See [Medium Article #10: Discounting Is Not a Number](https://medium.com/@lsh5864) for the full analysis.
+
+---
+
 ## Validation Framework
 
 Every calculation is validated against actuarial identities:
@@ -237,8 +274,8 @@ This is Part 3 of a 5-project series building toward a comprehensive insurance d
 1. **Small:** Insurance Policy Admin Mart — Portfolio Structure & KPIs
 2. **Medium-1:** Motor Insurance Claims Development & Loss Forecasting (P&C, backward-looking)
 3. **Medium-2:** This project — Life Insurance BEL Pipeline (Life, forward-looking)
-4. **Medium-3:** Reinsurance IFRS 17 — Retro Linkage & Loss Recovery (planned)
-5. **Large:** IFRS 17 Analytics Platform on Azure — E2E with CI/CD + Mack's Method (planned)
+4. **Medium-3:** Reinsurance IFRS 17 — Retro Linkage & Loss Recovery
+5. **Large:** Insurance Fraud Detection Pipeline on Azure (planned)
 
 ---
 
