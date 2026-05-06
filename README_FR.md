@@ -180,6 +180,40 @@ Voir [Article Medium #10 : Discounting Is Not a Number](https://medium.com/@lsh5
 
 ---
 
+## 📊 Analyse Multi-Versions Mortalité
+
+Le pipeline supporte simultanément plusieurs versions d'hypothèses de mortalité, permettant la comparaison du BEL entre différentes bases de mortalité.
+
+### Versions de Mortalité Chargées
+
+| Version ID | Source | Méthode |
+|---|---|---|
+| MORT_2026_04 (INSEE 2019) | Table de mortalité nationale INSEE, 2019 | Référence industrielle, instantané mono-année |
+| MORT_EXP_STUDY | HMD France 2015–2023 | Étude d'expérience : graduation A/E, pondération de crédibilité |
+
+La mortalité issue de l'étude d'expérience a été construite selon le processus actuariel standard : calcul du ratio A/E, graduation polynomiale et pondération de crédibilité par fluctuation limitée contre la table industrielle INSEE 2019. La fenêtre d'observation de neuf ans (2015–2023) inclut les années de pandémie COVID-19, produisant une mortalité structurellement plus élevée aux âges avancés.
+
+### Impact BEL (Scénario BASE, Courbe 2025-Q4 sans VA)
+
+| Version Mortalité | BEL Total | Δ vs INSEE 2019 |
+|---|---|---|
+| INSEE 2019 | 18,14M€ | — |
+| Étude d'Expérience | 26,83M€ | +8,7M€ (+48%) |
+
+**Effet mortalité : +48%.** Effet courbe d'actualisation sur les quatre courbes : 3,9%. Dans ce portefeuille, la mortalité domine l'actualisation comme facteur déterminant du BEL d'un ordre de grandeur.
+
+### Effet Croisé : Mortalité × Actualisation
+
+L'impact VA de l'actualisation augmente sous une mortalité plus élevée (−0,47M€ avec INSEE vs −0,56M€ avec Étude d'Expérience), confirmant que mortalité et actualisation ne sont pas indépendantes — elles interagissent à travers la structure des flux.
+
+### Implémentation
+
+L'ajout d'une seconde version de mortalité a nécessité la modification de 12 modèles dbt sans aucun changement de logique actuarielle — le même pattern d'extension dimensionnelle démontré avec l'actualisation multi-courbes (Article #10). La colonne `mort_version_id` a été propagée dans les GROUP BY et conditions de JOIN aux côtés du `version_id` existant.
+
+Voir [Article Medium #11 : Assumptions Are Built, Not Given](https://medium.com/@lsh5864) pour la méthodologie complète de l'étude d'expérience et l'analyse d'impact BEL.
+
+---
+
 ## Cadre de Validation
 
 Chaque calcul est validé contre les identités actuarielles :
@@ -226,12 +260,12 @@ Toutes les hypothèses sont générées via Databricks Notebooks (Python) et sto
 |---|---|
 | 8 model points | Millions de polices individuelles ou model points granulaires |
 | Projection déterministe | Simulation stochastique pour garanties et options |
-| Courbe d'actualisation unique | Courbes multiples (avec/sans VA, MA) |
+| Courbe d'actualisation unique | Multi-courbes implémentées (4 versions EIOPA RFR) |
 | Pas de marge de risque | Marge de risque via méthode Coût-du-Capital |
 | Pas de calcul SCR | SCR Formule Standard ou Modèle Interne |
 | Pas de rachat dynamique | Modèles de comportement assuré liés aux conditions économiques |
 | Frais moyens simples | Analyse détaillée des frais par type et allocation |
-| Tables de mortalité annuelles | Modèles d'amélioration de mortalité (CMI, Lee-Carter) |
+| Tables de mortalité annuelles | Multi-versions implémentées (INSEE + Étude d'Expérience) ; en production, ajout de modèles d'amélioration de mortalité (CMI, Lee-Carter) |
 | Pas de réassurance | BEL brut et net avec recouvrement de réassurance |
 
 ---

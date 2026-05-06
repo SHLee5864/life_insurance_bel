@@ -211,6 +211,40 @@ See [Medium Article #10: Discounting Is Not a Number](https://medium.com/@lsh586
 
 ---
 
+## 📊 Multi-Mortality Version Analysis
+
+The pipeline supports multiple mortality assumption versions simultaneously, enabling BEL comparison across different mortality bases.
+
+### Mortality Versions Loaded
+
+| Version ID | Source | Method |
+|---|---|---|
+| MORT_2026_04 (INSEE 2019) | INSEE national mortality table, 2019 | Industry benchmark, single-year snapshot |
+| MORT_EXP_STUDY | HMD France 2015–2023 | Experience study: A/E graduation, credibility weighting |
+
+The experience study mortality was built using the standard actuarial process: A/E ratio calculation, polynomial graduation, and Limited Fluctuation Credibility weighting against the INSEE 2019 industry table. The nine-year observation window (2015–2023) includes COVID-19 pandemic years, producing structurally higher mortality at older ages.
+
+### BEL Impact (BASE Scenario, 2025-Q4 no VA Curve)
+
+| Mortality Version | Total BEL | Δ vs INSEE 2019 |
+|---|---|---|
+| INSEE 2019 | €18.14M | — |
+| Experience Study | €26.83M | +€8.7M (+48%) |
+
+**Mortality effect: +48%.** Discount curve effect across all four curves: 3.9%. In this portfolio, mortality dominates discounting as a BEL driver by an order of magnitude.
+
+### Cross-Effect: Mortality × Discounting
+
+The VA discount impact increases under higher mortality (−€0.47M with INSEE vs −€0.56M with Experience Study), confirming that mortality and discounting are not independent — they interact through the cashflow structure.
+
+### Implementation
+
+Adding a second mortality version required modifying 12 dbt models with zero changes to actuarial logic — the same dimensional extension pattern proven with multi-curve discounting (Article #10). The `mort_version_id` column was propagated through GROUP BY and JOIN conditions alongside the existing `version_id`.
+
+See [Medium Article #11: Assumptions Are Built, Not Given](https://medium.com/@lsh5864) for the full experience study methodology and BEL impact analysis.
+
+---
+
 ## Validation Framework
 
 Every calculation is validated against actuarial identities:
@@ -257,12 +291,12 @@ All assumptions are generated via Databricks Notebooks (Python) and stored as De
 |---|---|
 | 8 model points | Millions of individual policies or granular model points |
 | Deterministic projection | Stochastic simulation for guarantees and options |
-| Single discount curve | Multiple curves (with/without VA, MA) |
+| Multiple curves (with/without VA) | Multi-curve implemented (4 EIOPA RFR versions) |
 | No risk margin | Risk margin via Cost-of-Capital method |
 | No SCR calculation | Standard Formula or Internal Model SCR |
 | No dynamic lapse | Policyholder behavior models linked to economic conditions |
 | Simple average expense | Detailed expense analysis by type and allocation |
-| Annual mortality tables | Mortality improvement models (CMI, Lee-Carter) |
+| Mortality improvement models | Multi-version implemented (INSEE + Experience Study); production would add mortality improvement models (CMI, Lee-Carter) |
 | No reinsurance | Gross and net BEL with reinsurance recovery |
 
 ---
